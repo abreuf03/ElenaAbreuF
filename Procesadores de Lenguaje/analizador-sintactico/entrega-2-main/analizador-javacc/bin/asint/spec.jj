@@ -1,0 +1,138 @@
+options  {
+  STATIC=false;
+  DEBUG_PARSER=true;
+  IGNORE_CASE=true;
+}
+PARSER_BEGIN(AnalizadorSintacticoTiny)
+package asint;
+
+public class AnalizadorSintacticoTiny {
+    protected void newToken(Token t) {}
+}
+PARSER_END(AnalizadorSintacticoTiny)
+
+// Léxico > Auxiliares
+  TOKEN:{<#letra:["a"-"z","A"-"Z"]>}
+  TOKEN:{<#natural:["1"-"9"]>}
+  TOKEN:{<#digito:<natural>|"0">}
+  TOKEN:{<#entero:<natural>(<digito>)*|"0">}
+  TOKEN:{<#decimal:(<digito>)*<natural>|"0">}
+  TOKEN:{<#exponencial:"e"("+"|"-")?<entero>>}
+  
+  // Léxico > Palabras clave
+  TOKEN:{<INT:"int">}
+  TOKEN:{<REAL:"real">}
+  TOKEN:{<BOOL:"bool">}
+  TOKEN:{<STRING:"string">}
+  TOKEN:{<AND:"and">}
+  TOKEN:{<OR:"or">}
+  TOKEN:{<NOT:"not">}
+  TOKEN:{<TRUE:"true">}
+  TOKEN:{<FALSE:"false">}
+  TOKEN:{<NULL:"null">}
+  TOKEN:{<IF:"if">}
+  TOKEN:{<ELSE:"else">}
+  TOKEN:{<WHILE:"while">}
+  TOKEN:{<STRUCT:"struct">}
+  TOKEN:{<NEW:"new">}
+  TOKEN:{<DELETE:"delete">}
+  TOKEN:{<READ:"read">}
+  TOKEN:{<WRITE:"write">}
+  TOKEN:{<NL:"nl">}
+  TOKEN:{<TYPE:"type">}
+  TOKEN:{<CALL:"call">}
+  TOKEN:{<PROC:"proc">}
+  
+  // Léxico > Variables
+  TOKEN:{<IDENTIFICADOR: (<letra> | "_") (<letra> | "_" | <digito>)*>}
+  TOKEN:{<LITERAL_ENTERO: (["+","-"])? <entero>>}
+  TOKEN:{<LITERAL_REAL: (["+","-"])? (<entero> <exponencial> | <entero> "." <decimal> | <entero> "." <decimal> <exponencial>)>}
+  TOKEN:{<LITERAL_CADENA: "\"" ((~["\""]))* "\"">}
+  
+  // Léxico > Cadenas ignorables
+  SKIP:{<["\t", " ", "\r", "\b", "\n"]>}
+	SKIP:{<"##" ((~["\n"]))*>}
+  
+  // Sintaxis
+  void analiza(): {} {bloque() <EOF>}
+  void bloque(): {} {"{" declaraciones() instrucciones() "}"}
+  
+  // Sintaxis > Declaraciones
+  void declaraciones(): {} {declaracion() r_declaraciones() "&&" | {}}
+  void r_declaraciones(): {} {";" declaracion() r_declaraciones() | {}}
+  
+  // Sintaxis > Declaraciones > Declaración
+  void declaracion(): {} {variable() | procedimiento() | definicion()}
+  
+  void variable(): {} {tipo() <IDENTIFICADOR>}
+  void procedimiento(): {} {<PROC> <IDENTIFICADOR> "(" proc_parametros() ")" bloque()}
+  void definicion(): {} {<TYPE> tipo() <IDENTIFICADOR>}
+  
+  void proc_parametros(): {} {proc_parametro() r_proc_parametros() | {}}
+  void r_proc_parametros(): {} {"," proc_parametro() r_proc_parametros() | {}}
+  void proc_parametro(): {} {tipo() ("&")? <IDENTIFICADOR>}
+
+  // Sintaxis > Declaraciones > Tipo
+  void tipo(): {} {tipo_1() r_tipo()}
+  void r_tipo(): {} {"[" <LITERAL_ENTERO> "]" r_tipo() | {}}
+  void tipo_1(): {} {tipo_2() | "^" tipo_1()}
+  void tipo_2(): {} {<STRUCT> "{" struct_bloque() "}" | <INT> | <REAL> | <BOOL> | <STRING> | <IDENTIFICADOR>}
+  
+  void struct_bloque(): {} {variable() r_struct_bloque()}
+  void r_struct_bloque(): {} {"," variable() r_struct_bloque() | {}}
+  
+  // Sintaxis > Instrucciones
+  void instrucciones(): {} {instruccion() r_lista_instrucciones() | {}}
+  void r_lista_instrucciones(): {} {";" instruccion() r_lista_instrucciones() | {}}
+
+  // Sintaxis > Instrucciones > Instrucción
+  void instruccion(): {} {
+    "@" e0() |
+    <IF> e0() bloque() sino() |
+    <WHILE> e0() bloque() |
+    manipular() e0() |
+    <CALL> <IDENTIFICADOR> "(" call_paramentros() ")" |
+    <NL> |
+    bloque()
+  }
+  void sino(): {} {<ELSE> instruccion() | {}}
+  void manipular(): {} {<READ> | <WRITE> | <NEW> | <DELETE>}
+  void call_paramentros(): {} {e0() r_call_parametros() | {}}
+  void r_call_parametros(): {} {"," e0() r_call_parametros() | {}}
+
+  // Sintaxis > Instrucciones > Expresión
+  void e0(): {} {e1() r_e0()}
+  void r_e0(): {} {op0() e1() r_e0() | {}}
+
+  void e1(): {} {e2() r_e1()}
+  void r_e1(): {} {op1() e2() r_e1() | {}}
+
+  void e2(): {} {e3() r1_e2() r2_e2()}
+  void r1_e2(): {} {"-" e3() | {}}
+  void r2_e2(): {} {"+" e3() r2_e2() | {}}
+
+  void e3(): {} {e4() r_e3()}
+  void r_e3(): {} {<AND> e4() r_e3() | <OR> e4() | {}}
+  
+  void e4(): {} {e5() r_e4()}
+  void r_e4(): {} {op4() e5() r_e4() | {}}
+
+  void e5(): {} {op5() e5() | e6()}
+
+  void e6(): {} {e7() r_e6()}
+  void r_e6(): {} {op6() r_e6() | {}}
+
+  void e7(): {} {<LITERAL_ENTERO> | <LITERAL_REAL> | <LITERAL_CADENA> | <TRUE> | <FALSE> | <IDENTIFICADOR> | <NULL> | e8()}
+
+  void e8(): {} {"(" e0() ")"}
+
+  // Sintaxis > Instrucciones > Operadores
+  void op0(): {} {"="}
+
+  void op1(): {} {"==" | "!=" | ">" | "<" | ">=" | "<="}
+
+  void op4(): {} {"*" | "/" | "%"}
+  
+  void op5(): {} {"-" | <NOT>}
+  
+  void op6(): {} {"[" e0() "]" | "." <IDENTIFICADOR> | "^"}

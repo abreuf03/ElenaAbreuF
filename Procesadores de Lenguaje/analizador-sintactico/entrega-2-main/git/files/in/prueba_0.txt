@@ -1,0 +1,27 @@
+{
+int tam;
+bool fin;
+real precio;
+&&
+@f=m*a;
+@not fin;
+@not not fin;
+@not (-fin);
+@not -(fin);
+@(not fin);
+@precio*tam;
+@precio/tam*fin;
+@precio/tam*not fin;
+@not -(true*precio);
+@true or false;
+@true and fin;
+@False or not fin;
+@a+b;
+@7 + 2 + 3;
+@-(a + 3);
+@masa*-aceleracion+finicial;
+@a--c;
+@a+b+c;
+##@3+2-7;
+@x=z+y=a*(b+c)=not(fin) + 2;
+}

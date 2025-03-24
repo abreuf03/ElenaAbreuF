@@ -1,0 +1,9 @@
+## Variantes de lo anterior con errores detectados
+{
+    bool booleano;
+    int tam
+    && {
+        @not;
+        @-int;
+    }
+}

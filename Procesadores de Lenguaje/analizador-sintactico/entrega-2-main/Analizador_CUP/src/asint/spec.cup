@@ -1,0 +1,97 @@
+package asint;
+
+import java_cup.runtime.*;
+import alex.AnalizadorLexicoTiny;
+import alex.UnidadLexica;
+import errors.GestionErroresEval;
+
+scan with {: 
+  return getScanner().next_token(); 
+:};
+
+parser code {: 
+   private GestionErroresEval errores;
+   public void syntax_error(Symbol unidadLexica) {
+     errores.errorSintactico((UnidadLexica)unidadLexica);
+   }
+:};
+
+init with {: 
+   errores = new GestionErroresEval();
+   AnalizadorLexicoTiny alex = (AnalizadorLexicoTiny)getScanner();
+   alex.fijaGestionErrores(errores);
+:};
+
+terminal LIT_ENTERO, ENTERO, LIT_REAL, REAL, BOOL, LIT_STRING, STRING, IDENTIFICADOR, TYPE, PROC, IF, ELSE, WHILE, CALL,
+         READ, WRITE, NEW, DELETE, NL, AND, OR, NOT, IGUAL, MAS, MENOS, POR, DIV, MOD, 
+         MAYOR, MENOR, MAYORIGUAL, MENORIGUAL, DIFERENTE, PAP, PCIERRE, PUNTOCOMA, COMA, 
+         LLAVEA, LLAVEC, AMP, STRUCT, CORA, CORC, PUNT, PUNTO, DOBLEAMPER,ARROBA, COMPARACION, NULL, TRUE, FALSE;
+
+non terminal programa, bloque, sec_declaraciones, lista_declaraciones,
+              declaraciones, variable, dec_tipo, procedimiento, parametros,
+              arg, amper_opt, tipo, tipo2, tipo3, campos, sec_instrucciones,
+              lista_instrucciones, instrucciones, ins_else,
+              p_res, expresion, e0, e1, e2, e3, e4, e5, e6, e7,e8, op0, op1, op2_izq,
+              op2_noasoc, op3_der, op3_noasoc, op4, op5, op6, param, opt_param,  opt_parametros;
+
+programa ::= bloque ;
+
+bloque ::= LLAVEA sec_declaraciones sec_instrucciones LLAVEC;
+
+sec_declaraciones ::= lista_declaraciones DOBLEAMPER | ;
+
+
+lista_declaraciones ::= lista_declaraciones PUNTOCOMA declaraciones | declaraciones;
+
+declaraciones ::= variable | procedimiento | dec_tipo;
+
+variable ::= tipo IDENTIFICADOR;
+dec_tipo ::= TYPE tipo IDENTIFICADOR;
+procedimiento ::= PROC IDENTIFICADOR PAP opt_parametros PCIERRE bloque;
+opt_parametros ::=  parametros | ;
+parametros ::=  parametros COMA arg | arg ;
+
+arg ::= tipo amper_opt IDENTIFICADOR;
+amper_opt ::= AMP | ;
+
+tipo ::= tipo CORA LIT_ENTERO CORC | tipo2;
+tipo2 ::= PUNT tipo2 | tipo3;
+tipo3 ::= STRUCT LLAVEA campos LLAVEC | IDENTIFICADOR | ENTERO | REAL | BOOL | STRING;
+
+campos ::= variable  COMA  campos| variable;
+
+sec_instrucciones ::= lista_instrucciones | ;
+
+lista_instrucciones ::= lista_instrucciones PUNTOCOMA instrucciones | instrucciones;
+
+instrucciones ::= ARROBA expresion | IF expresion bloque ins_else
+                | WHILE expresion bloque | p_res expresion | CALL IDENTIFICADOR PAP opt_param PCIERRE
+                | bloque | NL;
+ins_else ::= ELSE bloque | ;
+
+p_res ::= READ | WRITE | NEW | DELETE;
+
+opt_param ::= param | ;
+param ::= param COMA expresion | expresion;
+
+expresion ::= e0;
+e0 ::= e1 | e1 op0 e0;
+e1 ::= e2 | e1 op1 e2;
+e2 ::= e3 | e2 op2_izq e3 | e3 op2_noasoc e3;
+e3 ::= e4 | e4 op3_der e3 | e4 op3_noasoc e4;
+e4 ::= e5 | e4 op4 e5;
+e5 ::= e6 | op5 e6;
+e6 ::= e7 | e6 op6;
+e7 ::= e8 | LIT_ENTERO | LIT_REAL | TRUE | FALSE | LIT_STRING | IDENTIFICADOR | NULL;
+e8 ::= PAP expresion PCIERRE;
+
+op0 ::= IGUAL;
+op1 ::= DIFERENTE | MAYOR | MENOR | MAYORIGUAL | MENORIGUAL | COMPARACION;
+op2_izq ::= MAS;
+op2_noasoc ::= MENOS;
+op3_der ::= AND;
+op3_noasoc ::= OR;
+op4 ::= POR | DIV | MOD;
+op5 ::= MENOS | NOT;
+op6 ::= CORA expresion CORC | PUNTO IDENTIFICADOR | PUNT;
+
