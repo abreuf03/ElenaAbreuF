@@ -1,0 +1,43 @@
+/* body { 
+    color: #070000;
+    background-color: #BBDEFB;  
+}
+*/
+
+h1 { /* Titulo */
+    background-color: #1565C0;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 0;
+}
+
+
+
+.table, .table th, .table td { /* Tabla completa */
+    border: 2px solid #0d1e38;
+    text-align: center; /* Centrar horizontal */
+    vertical-align: middle; /* Centrar vertical */  
+}
+
+.sortable-header { /* Tabla cabecera ordenable */
+    cursor: pointer;
+    position: relative;
+    background-color: #1565C0 !important;
+    color: #FFFFFF !important;
+}
+    
+.sort-icon { /* Iconos de ordenacion */
+    margin-left: 5px;
+    font-size: 0.8em;
+    display: none;
+}
+
+/* Al pulsar la cabecera */
+.sortable-header.active { 
+    background-color: #1529c0 !important;
+    color: #e6efb1 !important;
+}
+.sortable-header.active .sort-icon { 
+    display: inline-block;
+}

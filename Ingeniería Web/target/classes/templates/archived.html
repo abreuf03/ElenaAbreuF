@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html class="h-100" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="fragments/head :: header" />
+    <link rel="stylesheet" th:href="@{/css/archived.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+
+<body class="d-flex flex-column h-100">
+<header th:replace="fragments/nav.html :: nav"></header>
+
+<h1>Historial de Subastas</h1>
+
+<table class="table table-bordered" id="mainTable">
+    <thead>
+        <tr>
+            <th class="sortable-header" onclick="sortTable(0)">ID Subasta</th>
+            <th class="sortable-header" onclick="sortTable(1)">Objeto Subastado</th>
+            <th class="sortable-header">Imagen</th>
+            <th class="sortable-header" onclick="sortTable(3)">Precio Final</th>
+            <th class="sortable-header" onclick="sortTable(4)">Ganador</th>
+            <th class="sortable-header" onclick="sortTable(5)">Fecha de Cierre</th>
+            <th class="sortable-header">Reseñas</th> <!-- Nueva columna -->
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr th:each="bid : ${archivedBids}">
+            <td th:text="${bid.id}"></td>
+            <td th:text="${bid.nombreProducto}"></td>
+            <td><img th:src="@{/products/{id}/pic(id=${bid.id})}" alt="Imagen del objeto" width="50" height="50" class="img-fluid rounded"></td>
+            <td th:text="${bid.precio}"></td>
+            <td th:text="${bid.usuario}"></td>
+            <td th:text="${bid.fecha}"></td>
+            <td>
+                <div th:if="${bid.estadoSubasta.name()} == 'FINALIZADA'">
+                    <span th:if="${bid.comentarioGanador != null}" th:text="${bid.comentarioGanador}" class="text-success">Reseñada</span>
+                    <span th:unless="${bid.comentarioGanador != null}" class="text-muted">Sin comentario</span>
+                    <br>
+                    <span th:if="${bid.valoracionGanador != null}" th:text="${bid.valoracionGanador} + '/5'" class="text-success">Valoracion</span>
+                    <span th:unless="${bid.valoracionGanador != null}" class="text-muted">Sin valoracion</span>
+                </div>
+                <div th:if="${bid.estadoSubasta.name()} != 'FINALIZADA'">
+                    <span class="text-muted">Sin reseña</span>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<th:block th:replace="fragments/footer.html :: footer" />
+<script src="/js/archived.js"></script>
+
+</body>
+</html>

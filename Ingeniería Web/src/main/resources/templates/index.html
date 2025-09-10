@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html class="h-100" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{fragments/head :: header}" />
+    <title>IW: Subastas</title>
+    <style>
+        .disabled-a {
+            pointer-events: none; 
+            color: gray; 
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <header th:replace="~{fragments/nav.html :: nav}"></header>
+
+    <main class="flex-shrink-0">
+        <div class="container-fluid ps-4 pe-4">
+            <th:block th:if="${u}">
+                <div class="row mt-3">
+                    <!-- Button trigger modal -->
+                    <button id="btnModalSubasta" type="button" class="btn btn-outline-danger w-100 text-uppercase"
+                        data-bs-toggle="modal" data-bs-target="#modalCrearSubasta">
+                        Crear una nueva subasta
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="modalCrearSubasta" tabindex="-1"
+                        aria-labelledby="modalCrearSubastaLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content border border-white bg-dark text-white">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="modalCrearSubastaLabel">Crear una nueva subasta
+                                    </h1>
+                                    <button type="button" class="btn-close bg-danger" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form th:action="@{/products/nueva_subasta}" method="post"
+                                        enctype="multipart/form-data" onsubmit="return validarFormulario()">
+                                        <div class="mb-3">
+                                            <label for="photo" class="form-label">Foto del objeto</label>
+                                            <input class="form-control" type="file" name="photo" id="photo">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="nuevaFechaInicio">Fecha de inicio</label>
+                                            <input class="form-control" id="nuevaFechaInicio" name="nuevaFechaInicio"
+                                                type="date" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="nuevaFechaFin">Fecha de fin</label>
+                                            <input class="form-control" type="date" id="nuevaFechaFin"
+                                                name="nuevaFechaFin" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="nombreProducto">Nombre del producto a
+                                                subastar</label>
+                                            <input class="form-control" type="text" id="nombreProducto" name="nombre"
+                                                placeholder="Introduce un nombre" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="descripcionProducto">Descripción del producto
+                                                a subastar</label>
+                                            <div class="form-floating">
+                                                <textarea class="form-control"
+                                                    placeholder="Introduce la descripción del producto"
+                                                    id="descripcionProducto" name="descripcion" required></textarea>
+                                                <label for="descripcionProducto">Introduce la descripción del
+                                                    producto</label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="precioInicial">Precio inicial de
+                                                subasta</label>
+                                            <input class="form-control" id="precioInicial" name="precio"
+                                                type="number" placeholder="Introduce el precio inicial" min="0"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <button id="btnCrearSubasta" class="btn btn-danger w-100"
+                                                type="submit">Crear
+                                                subasta</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary text-white w-100"
+                                        data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+            <div class="row mt-3">
+                <div class="col-auto" th:each="obj: ${productos}">
+                    <div class="detalles-card p-1">
+                        <img th:src="@{/products/{id}/pic(id=${obj.id})}" class="border border-white rounded"
+                            alt="Imagen objeto" width="400" height="500">
+                        <div class="row details mt-2 justify-content-between align-items-center">
+                            <h3 class="text-uppercase fw-bold col-auto" th:text="${obj.nombre}">Reloj de Muñeca</h3>
+                            <h4 class="fw-bold col-auto text-success" th:text="${obj.precioActual + ' €'}"></h4>
+                        </div>
+                        <p class="row ps-3 fst-italic" th:if="${obj.estadoSubasta.name() == 'PENDIENTE'}" th:text="${'Estara disponible a las ' + obj.fechaInicio}"></p>
+                        <p class="row ps-3 fst-italic" th:if="${obj.estadoSubasta.name() == 'EN_CURSO'}" th:text="${'Disponible hasta ' + obj.fechaFin}"></p>
+                        <div class="btn-group-vertical w-100" role="group" aria-label="Vertical button group">
+                            <a th:href="@{/products/{id}(id=${obj.id})}"  th:classappend="${obj.estadoSubasta.name() == 'PENDIENTE'} ? 'disabled-a' : ''"
+                                class="btn btn-danger fw-bolder text-uppercase fs-3">
+                                <i class="bi bi-person-raised-hand"></i>
+                                ¡Pujar!
+                                <i class="bi bi-person-raised-hand"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </main>
+
+    <th:block th:replace="~{fragments/footer.html :: footer}" />
+    <script>
+        function validarFormulario() {
+            const fechaInicio = document.getElementById("nuevaFechaInicio").value;
+            const fechaFin = document.getElementById("nuevaFechaFin").value;
+
+            if (fechaInicio >= fechaFin) {
+                alert("La fecha de inicio no puede ser posterior a la fecha de fin.");
+                return false; 
+            }
+            return true;
+        }
+    </script>
+</body>
+
+</html>
