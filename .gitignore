@@ -1,0 +1,19 @@
+# Archivos temporales
+*.tmp
+*.lock
+
+# Java compilado
+*.class
+
+# Directorios de compilación
+bin/
+out/
+
+# Índices generados por Lucene
+**/index/
+**/suggester_index/
+
+# Dependencias generadas/descargadas
+*.jar
+
+Recuperación de Información/PRACTICA 6/doc/listings.csv
