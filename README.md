@@ -8,6 +8,10 @@ En la asignatura de **Procesadores de Lenguaje**, desarrollamos un procesador pa
 
 En la asignatura de **Ingeniería Web**, creamos una página web funcional para una casa de subastas.
 
+En la asignatura de **Recuperación de Información**, trabajamos con técnicas de indexación y búsqueda de información utilizando herramientas como **Lucene**, desarrollando diferentes prácticas relacionadas con el procesamiento de textos y la creación de sistemas de recuperación de información.
+
+En la asignatura de **Sistemas Multidimensionales**, trabajamos con bases de datos multidimensionales, realizando consultas multidimensionales, diseñando e implementando esquemas multidimensionales y desarrollando procesos **ETL**.
+
 ---
 
 # My Computer Engineering Projects
@@ -18,4 +22,8 @@ In the **Interactive Systems Development** course, we carried out a group projec
 
 In the **Language Processors** course, we developed a processor for a programming language.
 
-In the **Web Engineering course** , we created a functional website for an auction house.
+In the **Web Engineering** course, we created a functional website for an auction house.
+
+In the **Information Retrieval** course, we worked with information indexing and retrieval techniques using tools such as **Lucene**, developing different practical assignments related to text processing and the creation of information retrieval systems.
+
+In the **Multidimensional Systems** course, we worked with multidimensional databases, performing multidimensional queries, designing and implementing multidimensional database schemas, and developing **ETL** processes.
